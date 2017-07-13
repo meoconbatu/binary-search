@@ -1,20 +1,19 @@
 package binarysearch
 
 import (
-	"strconv"
-	"strings"
+	"fmt"
 )
 
 const testVersion = 1
 
 var (
-	messageTemplateSuccessBegin = "? found at beginning of slice"
-	messageTemplateSuccessEnd   = "? found at end of slice"
-	messageTemplateSuccess1     = "? found at index ?"
-	messageTemplateFail         = "? > ? at index ?, < ? at index ?"
+	messageTemplateSuccessBegin = "%d found at beginning of slice"
+	messageTemplateSuccessEnd   = "%d found at end of slice"
+	messageTemplateSuccess1     = "%d found at index %d"
+	messageTemplateFail         = "%d > %d at index %d, < %d at index %d"
 	messageTemplateNil          = "slice has no values"
-	messageTemplateMin          = "? < all values"
-	messageTemplateMax          = "? > all ? values"
+	messageTemplateMin          = "%d < all values"
+	messageTemplateMax          = "%d > all %d values"
 )
 
 func SearchInts(slices []int, key int) (x int) {
@@ -48,35 +47,23 @@ func SearchInts(slices []int, key int) (x int) {
 	}
 	return mink
 }
-func Message(slices []int, key int) (res string) {
+func Message(slices []int, key int) string {
 	if slices == nil {
 		return messageTemplateNil
 	}
 	index := SearchInts(slices, key)
 	if index == len(slices) {
-		res = strings.Replace(messageTemplateMax, "?", strconv.Itoa(key), 1)
-		res = strings.Replace(res, "?", strconv.Itoa(len(slices)), 1)
-		return
+		return fmt.Sprintf(messageTemplateMax, key, len(slices))
 	}
 	if slices[index] == key {
 		if index == 0 {
-			res = strings.Replace(messageTemplateSuccessBegin, "?", strconv.Itoa(key), 1)
+			return fmt.Sprintf(messageTemplateSuccessBegin, key)
 		} else if index == len(slices)-1 {
-			res = strings.Replace(messageTemplateSuccessEnd, "?", strconv.Itoa(key), 1)
-		} else {
-			res = strings.Replace(messageTemplateSuccess1, "?", strconv.Itoa(key), 1)
-			res = strings.Replace(res, "?", strconv.Itoa(index), 1)
+			return fmt.Sprintf(messageTemplateSuccessEnd, key)
 		}
-	} else {
-		if index == 0 {
-			res = strings.Replace(messageTemplateMin, "?", strconv.Itoa(key), 1)
-		} else {
-			res = strings.Replace(messageTemplateFail, "?", strconv.Itoa(key), 1)
-			res = strings.Replace(res, "?", strconv.Itoa(slices[index-1]), 1)
-			res = strings.Replace(res, "?", strconv.Itoa(index-1), 1)
-			res = strings.Replace(res, "?", strconv.Itoa(slices[index]), 1)
-			res = strings.Replace(res, "?", strconv.Itoa(index), 1)
-		}
+		return fmt.Sprintf(messageTemplateSuccess1, key, index)
+	} else if index == 0 {
+		return fmt.Sprintf(messageTemplateMin, key)
 	}
-	return
+	return fmt.Sprintf(messageTemplateFail, key, slices[index-1], index-1, slices[index], index)
 }
